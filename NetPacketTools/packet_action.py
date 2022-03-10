@@ -12,7 +12,7 @@ class PacketAction:
       self.Ip= self.nic.ip
       self.mac = self.nic.mac
       self.linklocalIp = [x for x in self.nic.ips[6] if 'fe80::' in x][0]
-      self.globalIp = [x for x in self.nic.ips[6] if '2001:' in x]
+      self.globalIp = [x for x in self.nic.ips[6] if '2001:' in x][0]
       self.gatewayIp = conf.route.route('0.0.0.0')[2] 
       self.gatewatIpv6 = conf.route6.route('::')[2]
    
@@ -36,7 +36,6 @@ class PacketAction:
       else: return 
       if resultACK :
          return yIP
-      
       
    def GetIPfromDHCPv6(self,tranId:int,mac:str)->str | None:
       duidformat = bytearray.fromhex('000100012796d07c'+''.join(mac.split(':')))
@@ -66,27 +65,6 @@ class PacketAction:
          return 
       if resultACK6:
          return resultAdvertise[0][1][DHCP6OptIAAddress].addr
-
-   def ARPBlockCheck(self,srcIP:str,dstIP:str,ProbeMAC:str)->bool:
-      ARPRequest = Ether(src =self.mac,dst='ff:ff:ff:ff:ff:ff')\
-         /ARP(op=1,hwsrc=self.mac, hwdst="00:00:00:00:00:00",psrc=srcIP, pdst=dstIP)
-      result ,nums = srp(ARPRequest, retry=2,timeout=5,iface=self.nicname,multi=True)
-      if not result : return False
-      for s, r in result:
-         if r[ARP].psrc == dstIP and r[ARP].hwsrc == ProbeMAC and r[ARP].hwdst == self.mac and r[ARP].pdst == srcIP:
-            return True
-      return False
-
-   def NDPBlockCheck(self,srcIP:str,dstIP:str,ProbeMAC:str)->bool:
-      NDPSolic = Ether(src =self.mac,dst='33:33:ff:00:00:01')\
-         /IPv6(src=srcIP,dst='ff02::1')\
-            /ICMPv6ND_NS(tgt=dstIP)
-      result ,nums = srp(NDPSolic,retry=2,timeout=5,iface=self.nicname,multi=True)
-      if not result: return False
-      for s, r in result:
-         if r[ICMPv6ND_NA].tgt == dstIP and r[ICMPv6NDOptDstLLAddr].lladdr == ProbeMAC and r[IPv6].dst == srcIP and r[Ether].dst == self.mac:
-            return True
-      return False
 
    def SendDHCPv4Offer(self)->None:
       DHCPv4Offer = Ether(src =self.mac,dst='ff:ff:ff:ff:ff:ff')\
@@ -133,6 +111,13 @@ class PacketAction:
          /ARP(op=1,hwsrc=self.mac, hwdst="00:00:00:00:00:00",psrc=self.Ip, pdst=dstip)
       result ,nums = srp(arprequest, retry=2,timeout=5,iface=self.nicname)
       return result[0][1][ARP].hwsrc if result else None
+
+   def GetIPv6MAC(self,dstIP:str)->str | None:
+      NDPSolic = Ether(src =self.mac,dst='33:33:ff:00:00:01')\
+         /IPv6(src=self.globalIp,dst='ff02::1')\
+            /ICMPv6ND_NS(tgt=dstIP)
+      result ,nums = srp(NDPSolic,retry=2,timeout=5,iface=self.nicname,multi=True)
+      return result[0][1][ICMPv6NDOptDstLLAddr].lladdr if result else None
       
    def GetRadiusReply(self,serverip:str,nasip:str)->dict | None:
       dstmac = self.GetIPv4MAC(self.gatewayIp)
@@ -148,3 +133,21 @@ class PacketAction:
       else : 
          return {'RadiusCode':result[0][1][Radius].code}
       #Radius Code : Accept =2 , Reject =3
+
+   def ConvertIPv6ShortToIPv6Full(self,ipv6:str) -> str | None:
+    iplist = ipv6.split('::')
+    if len(iplist) > 2 or len(ipv6.split(':')) > 8:
+        return
+    ipaddr = ['0000'] * 8
+    preip = iplist[0].split(':')
+    idx = 0
+    for i in preip :
+        ipaddr[idx] = i.zfill(4)
+        idx += 1
+    if len(iplist) == 2 :
+        postip = iplist[1].split(':')
+        idx = -1
+        for i in postip :
+            ipaddr[idx] = i.zfill(4)
+            idx -= 1
+    return ':'.join(ipaddr)
