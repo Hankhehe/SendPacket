@@ -81,13 +81,13 @@ class PacketAction:
                /DHCP6_Advertise(trid=1)
       sendp(DHCPv6Advertise,iface=self.nicname)
    
-   def SendRA(self)->None:
+   def SendRA(self,flagM:int,flagO:int,Prefix:str)->None:
       RouteAdvertise = Ether(src =self.mac,dst='33:33:00:00:00:01')\
-         /IPv6(src=self.globalIp,dst='ff02::1')\
-            /ICMPv6ND_RA(prf=0)\
+         /IPv6(src=self.linklocalIp,dst='ff02::1')\
+            /ICMPv6ND_RA(prf=0,M=flagM,O=flagO)\
                /ICMPv6NDOptSrcLLAddr(lladdr=self.mac)\
                   /ICMPv6NDOptMTU()\
-                     /ICMPv6NDOptPrefixInfo(prefix='2001:b030:2133:99::')
+                     /ICMPv6NDOptPrefixInfo(prefix=Prefix)
       sendp(RouteAdvertise,iface=self.nicname)
 
    def SendARPReply(self,IP:str,Count:int=1,WaitSec:int=0)->None:
