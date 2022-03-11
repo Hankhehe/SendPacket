@@ -75,14 +75,14 @@ class PacketAction:
       sendp(DHCPv4Offer,iface=self.nicname)
    
    def SendDHCPv6Advertise(self)->None:
-      DHCPv6Advertise = Ether(src =self.mac,dst='33:33:ff:00:00:01')\
+      DHCPv6Advertise = Ether(src =self.mac,dst='33:33:00:00:00:01')\
          /IPv6(src=self.linklocalIp,dst='ff02::1')\
             /UDP(sport=547,dport=546)\
                /DHCP6_Advertise(trid=1)
       sendp(DHCPv6Advertise,iface=self.nicname)
    
    def SendRA(self)->None:
-      RouteAdvertise = Ether(src =self.mac,dst='33:33:ff:00:00:01')\
+      RouteAdvertise = Ether(src =self.mac,dst='33:33:00:00:00:01')\
          /IPv6(src=self.globalIp,dst='ff02::1')\
             /ICMPv6ND_RA(prf=0)\
                /ICMPv6NDOptSrcLLAddr(lladdr=self.mac)\
@@ -99,7 +99,7 @@ class PacketAction:
 
    def SendNA(self,IP:str,Count:int=1,WaitSec:int=0)->None:
       for i in range(Count):
-         NDPAdver = Ether(src =self.mac,dst='33:33:ff:00:00:01')\
+         NDPAdver = Ether(src =self.mac,dst='33:33:00:00:00:01')\
             /IPv6(src=IP,dst='ff02::1')\
                /ICMPv6ND_NA(tgt=IP,R=0,S=1)\
                   /ICMPv6NDOptSrcLLAddr(type=2,lladdr=self.mac)
