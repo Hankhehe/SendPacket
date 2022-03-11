@@ -1,4 +1,4 @@
-import time
+import time,re
 from scapy.all import get_working_if,get_working_ifaces,srp,sendp,conf,Ether,ARP,IP,UDP,BOOTP,DHCP,IPv6,DHCP6_Solicit,DHCP6OptElapsedTime,DHCP6OptClientId\
    ,DHCP6OptIA_NA,DHCP6OptOptReq,DHCP6_Request,DHCP6OptServerId,DHCP6OptIAAddress,ICMPv6NDOptDstLLAddr,DHCP6_Advertise,ICMPv6ND_NS,ICMPv6NDOptSrcLLAddr\
       ,ICMPv6ND_RA,ICMPv6NDOptMTU,ICMPv6NDOptPrefixInfo,ICMPv6ND_NA,Radius,RadiusAttr_NAS_IP_Address,RadiusAttribute
@@ -113,10 +113,14 @@ class PacketAction:
       return result[0][1][ARP].hwsrc if result else None
 
    def GetIPv6MAC(self,dstIP:str)->str | None:
-      NDPSolic = Ether(src =self.mac,dst='33:33:ff:00:00:01')\
-         /IPv6(src=self.globalIp,dst='ff02::1')\
-            /ICMPv6ND_NS(tgt=dstIP)
-      result ,nums = srp(NDPSolic,retry=2,timeout=5,iface=self.nicname,multi=True)
+      IPv6IPfull = self.ConvertIPv6ShortToIPv6Full(dstIP)
+      if not IPv6IPfull : return 
+      dstMACformulti = ':'.join( re.findall(r'.{2}','3333ff'+ IPv6IPfull[-7:].replace(':','')))
+      dipformulti = 'ff02::1:ff'+IPv6IPfull[-7:]
+      NDPSolic = Ether(src =self.mac,dst=dstMACformulti)\
+         /IPv6(src=self.linklocalIp,dst=dipformulti)\
+            /ICMPv6ND_NS(tgt=IPv6IPfull)
+      result ,nums = srp(NDPSolic,retry=2,timeout=5,iface=self.nicname)
       return result[0][1][ICMPv6NDOptDstLLAddr].lladdr if result else None
       
    def GetRadiusReply(self,serverip:str,nasip:str)->dict | None:
@@ -147,7 +151,7 @@ class PacketAction:
     if len(iplist) == 2 :
         postip = iplist[1].split(':')
         idx = -1
-        for i in postip :
+        for i in postip[::-1] :
             ipaddr[idx] = i.zfill(4)
             idx -= 1
     return ':'.join(ipaddr)
