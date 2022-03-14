@@ -151,7 +151,7 @@ class PacketAction:
          idx += 1
       if len(iplist) == 2 :
          postip = iplist[1].split(':')
-         if len(postip) != 4 : return
+         if len(postip) > 4 : return
          idx = -1
          for i in postip[::-1] :
                ipaddr[idx] = i.zfill(4)
