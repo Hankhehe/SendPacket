@@ -1,5 +1,5 @@
 import time,re
-from turtle import position
+from CreateData import iprelated
 from scapy.all import get_working_if,get_working_ifaces,srp,sendp,conf,Ether,ARP,IP,UDP,BOOTP,DHCP,IPv6,DHCP6_Solicit,DHCP6OptElapsedTime,DHCP6OptClientId\
    ,DHCP6OptIA_NA,DHCP6OptOptReq,DHCP6_Request,DHCP6OptServerId,DHCP6OptIAAddress,ICMPv6NDOptDstLLAddr,DHCP6_Advertise,ICMPv6ND_NS,ICMPv6NDOptSrcLLAddr\
       ,ICMPv6ND_RA,ICMPv6NDOptMTU,ICMPv6NDOptPrefixInfo,ICMPv6ND_NA,Radius,RadiusAttr_NAS_IP_Address,RadiusAttribute
@@ -110,18 +110,18 @@ class PacketAction:
    def GetIPv4MAC(self,dstip:str)->str | None:
       arprequest = Ether(src=self.mac,dst = 'ff:ff:ff:ff:ff:ff')\
          /ARP(op=1,hwsrc=self.mac, hwdst="00:00:00:00:00:00",psrc=self.Ip, pdst=dstip)
-      result ,nums = srp(arprequest, retry=2,timeout=5,iface=self.nicname)
+      result ,nums = srp(arprequest, retry=2,timeout=1,iface=self.nicname)
       return result[0][1][ARP].hwsrc if result else None
 
    def GetIPv6MAC(self,dstIP:str)->str | None:
-      IPv6IPfull = self.ConvertIPv6ShortToIPv6Full(dstIP)
+      IPv6IPfull = iprelated.ConvertIPv6ShortToIPv6Full(dstIP)
       if not IPv6IPfull : return 
       dstMACformulti = ':'.join( re.findall(r'.{2}','3333ff'+ IPv6IPfull[-7:].replace(':','')))
       dipformulti = 'ff02::1:ff'+IPv6IPfull[-7:]
       NDPSolic = Ether(src =self.mac,dst=dstMACformulti)\
          /IPv6(src=self.linklocalIp,dst=dipformulti)\
             /ICMPv6ND_NS(tgt=IPv6IPfull)
-      result ,nums = srp(NDPSolic,retry=2,timeout=5,iface=self.nicname)
+      result ,nums = srp(NDPSolic,retry=2,timeout=1,iface=self.nicname)
       return result[0][1][ICMPv6NDOptDstLLAddr].lladdr if result else None
       
    def GetRadiusReply(self,serverip:str,nasip:str)->dict | None:
@@ -138,22 +138,3 @@ class PacketAction:
       else : 
          return {'RadiusCode':result[0][1][Radius].code}
       #Radius Code : Accept =2 , Reject =3
-
-   def ConvertIPv6ShortToIPv6Full(self,ipv6:str) -> str | None:
-      iplist = ipv6.split('::')
-      if len(iplist) > 2 or len(ipv6.split(':')) > 8:
-         return
-      ipaddr = ['0000'] * 8
-      preip = iplist[0].split(':')
-      idx = 0
-      for i in preip :
-         ipaddr[idx] = i.zfill(4)
-         idx += 1
-      if len(iplist) == 2 :
-         postip = iplist[1].split(':')
-         if len(postip) > 4 : return
-         idx = -1
-         for i in postip[::-1] :
-               ipaddr[idx] = i.zfill(4)
-               idx -= 1
-      return ':'.join(ipaddr)
