@@ -1,5 +1,6 @@
+from string import punctuation
 import time,re
-from CreateData import iprelated
+from CreateData import iprelated,macrelated
 from scapy.all import get_working_if,get_working_ifaces,srp,sendp,conf,Ether,ARP,IP,UDP,BOOTP,DHCP,IPv6,DHCP6_Solicit,DHCP6OptElapsedTime,DHCP6OptClientId\
    ,DHCP6OptIA_NA,DHCP6OptOptReq,DHCP6_Request,DHCP6OptServerId,DHCP6OptIAAddress,ICMPv6NDOptDstLLAddr,DHCP6_Advertise,ICMPv6ND_NS,ICMPv6NDOptSrcLLAddr\
       ,ICMPv6ND_RA,ICMPv6NDOptMTU,ICMPv6NDOptPrefixInfo,ICMPv6ND_NA,Radius,RadiusAttr_NAS_IP_Address,RadiusAttribute
@@ -13,7 +14,7 @@ class PacketAction:
       self.Ip= self.nic.ip
       self.mac = self.nic.mac
       self.linklocalIp = [x for x in self.nic.ips[6] if 'fe80::' in x][0]
-      self.globalIp = [x for x in self.nic.ips[6] if '2001:' in x][0]
+      self.globalIp = [x for x in self.nic.ips[6] if '2001:' in x]
       self.gatewayIp = conf.route.route('0.0.0.0')[2] 
       self.gatewatIpv6 = conf.route6.route('::')[2]
    
@@ -91,19 +92,27 @@ class PacketAction:
                      /ICMPv6NDOptPrefixInfo(prefix=Prefix)
       sendp(RouteAdvertise,iface=self.nicname)
 
-   def SendARPReply(self,IP:str,Count:int=1,WaitSec:int=0)->None:
+   def SendARPReply(self,IP:str,MAC:str|None,Count:int=1,WaitSec:int=0)->None:
+      if MAC :
+         MAC = macrelated.ConvertMACbyPunctuation(mac=MAC,Punctuation=':')
+      else :
+         MAC = self.mac
       for i in range(Count):
-         ARPReply = Ether(src =self.mac,dst='ff:ff:ff:ff:ff:ff')\
-            /ARP(op=2, hwsrc=self.mac, psrc=IP)
+         ARPReply = Ether(src =MAC,dst='ff:ff:ff:ff:ff:ff')\
+            /ARP(op=2, hwsrc=MAC, psrc=IP)
          sendp(ARPReply,iface=self.nicname)
          time.sleep(WaitSec)
 
-   def SendNA(self,IP:str,Count:int=1,WaitSec:int=0)->None:
+   def SendNA(self,IP:str,MAC:str|None,Count:int=1,WaitSec:int=0)->None:
+      if MAC :
+         MAC = macrelated.ConvertMACbyPunctuation(mac=MAC,Punctuation=':')
+      else :
+         MAC = self.mac
       for i in range(Count):
-         NDPAdver = Ether(src =self.mac,dst='33:33:00:00:00:01')\
+         NDPAdver = Ether(src =MAC,dst='33:33:00:00:00:01')\
             /IPv6(src=IP,dst='ff02::1')\
                /ICMPv6ND_NA(tgt=IP,R=0,S=1)\
-                  /ICMPv6NDOptSrcLLAddr(type=2,lladdr=self.mac)
+                  /ICMPv6NDOptSrcLLAddr(type=2,lladdr=MAC)
          sendp(NDPAdver,iface=self.nicname)
          time.sleep(WaitSec)
 
