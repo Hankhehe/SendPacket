@@ -92,7 +92,7 @@ class PacketAction:
                      /ICMPv6NDOptPrefixInfo(prefix=Prefix)
       sendp(RouteAdvertise,iface=self.nicname)
 
-   def SendARPReply(self,IP:str,MAC:str|None,Count:int=1,WaitSec:int=0)->None:
+   def SendARPReply(self,IP:str,MAC:str|None=None,Count:int=1,WaitSec:int=0)->None:
       if MAC :
          MAC = macrelated.ConvertMACbyPunctuation(mac=MAC,Punctuation=':')
       else :
@@ -103,7 +103,7 @@ class PacketAction:
          sendp(ARPReply,iface=self.nicname)
          time.sleep(WaitSec)
 
-   def SendNA(self,IP:str,MAC:str|None,Count:int=1,WaitSec:int=0)->None:
+   def SendNA(self,IP:str,MAC:str|None=None,Count:int=1,WaitSec:int=0)->None:
       if MAC :
          MAC = macrelated.ConvertMACbyPunctuation(mac=MAC,Punctuation=':')
       else :
