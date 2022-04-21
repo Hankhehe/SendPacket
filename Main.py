@@ -6,8 +6,8 @@ import time
 
 
 testcase = PacketRelated8021X()
-testcase.CalculateHashFromPacket(pcapfilepath='D:/test.pcap',secrectkey=b'pixis')
-
+testcase.CalculateHashFromPacket(pcapfilepath='D:/test.pcap',packetidx=0,secrectkey=b'pixis')
+pass
 # ipv4data = iprelated.CreateIPDataByCIDROrPrifix('192.168.11.0/24')
 # ipv6data = iprelated.CreateIPDataByCIDROrPrifix('2001:b030:2133:80b::11:0/112')
 # macdata = macrelated.CreateMACData('AA0000000000',256)
