@@ -39,15 +39,36 @@ class PacketRelated8021X(PacketAction):
                /radiuspacket
         wrpcap('C:/Users/Public/CoA.pcap',readiusCoArequestpacket)
         sendp(readiusCoArequestpacket)
+    
+    def CalcuProxyMessageAuthenticator(self,pcapfilepath:str,packetidx:int,secrectkey:bytes) -> None:
+        radiusProxyPacketPayload = rdpcap(pcapfilepath)[packetidx]['Radius']
+        radiusOringPacketPayload = rdpcap(pcapfilepath)[packetidx-1]['Radius']
+        radiusProxyPacketPayload.authenticator = bytes.fromhex('00'*16)
+        radiusProxyPacketPayload['RadiusAttr_Message_Authenticator'].value = radiusOringPacketPayload['RadiusAttr_Message_Authenticator'].value
+        print('authenticator Before : ' + radiusProxyPacketPayload.authenticator.hex())
+        print('Message-Authen Before : ' + radiusProxyPacketPayload['RadiusAttr_Message_Authenticator'].value.hex())
+        print('Message-Authen : ' +hmac.new(secrectkey,bytes(radiusProxyPacketPayload),hashlib.md5).hexdigest())
+        radiusProxyPacketPayload['RadiusAttr_Message_Authenticator'].value = bytes.fromhex('00'*16)
+        print('authenticator Before : ' + radiusProxyPacketPayload.authenticator.hex())
+        print('Message-Authen Before : ' + radiusProxyPacketPayload['RadiusAttr_Message_Authenticator'].value.hex())
+        print('Message-Authen : ' +hmac.new(secrectkey,bytes(radiusProxyPacketPayload),hashlib.md5).hexdigest())
+
+    def CalcuRespondAuthenticator(self,pcapfilepath:str,packetidx:int,secrectkey:bytes) -> None:
+        radiusRespondPacketPayload = rdpcap(pcapfilepath)[packetidx]['Radius']
+        radiusRequestPacketPayload = rdpcap(pcapfilepath)[packetidx-1]['Radius']
+        radiusRespondPacketPayload.authenticator = radiusRequestPacketPayload.authenticator
+        print('authenticator Before : ' + radiusRespondPacketPayload.authenticator.hex())
+        print('authenticator : '+hashlib.md5(bytes(radiusRespondPacketPayload)+secrectkey).hexdigest())
 
     def CalculateHashFromPacket(self,pcapfilepath:str,packetidx:int,secrectkey:bytes): #計算封包的 Hash key 
-        # radiuspacket = rdpcap('D:/test.pcap')[0]['Radius']
-        pcapfilepath = 'D:/test.pcap'
-        secrectkey = b'pixis'
+        # pcapfilepath = 'D:/test.pcap'
+        # secrectkey = b'pixis'
 
         # 原檔計算
         radiuspacketpayload = rdpcap(pcapfilepath)[packetidx]['Radius']
         print('-------------------------A = 原始、M = 原始-----------------------------------------')
+        print('authenticator Before : ' + radiuspacketpayload.authenticator.hex())
+        print('Message-Authen Before : ' + radiuspacketpayload['RadiusAttr_Message_Authenticator'].value.hex())
         print('authenticator : '+hashlib.md5(bytes(radiuspacketpayload)+secrectkey).hexdigest())
         print('Message-Authen : ' +hmac.new(secrectkey,bytes(radiuspacketpayload),hashlib.md5).hexdigest())
 
@@ -55,6 +76,8 @@ class PacketRelated8021X(PacketAction):
         radiuspacketpayload = rdpcap(pcapfilepath)[packetidx]['Radius']
         radiuspacketpayload.authenticator = bytes.fromhex('0'*32)
         print('-------------------------A = 0、M = 原始-----------------------------------------')
+        print('authenticator Before : ' + radiuspacketpayload.authenticator.hex())
+        print('Message-Authen Before : ' + radiuspacketpayload['RadiusAttr_Message_Authenticator'].value.hex())
         print('authenticator : '+hashlib.md5(bytes(radiuspacketpayload)+secrectkey).hexdigest())
         print('Message-Authen : ' +hmac.new(secrectkey,bytes(radiuspacketpayload),hashlib.md5).hexdigest())
 
@@ -63,21 +86,27 @@ class PacketRelated8021X(PacketAction):
         try:
             radiuspacketpayload['RadiusAttr_Message_Authenticator'].value = bytes.fromhex('0'*32)
             print('-------------------------A = 原始、M = 0-----------------------------------------')
+            print('authenticator Before : ' + radiuspacketpayload.authenticator.hex())
+            print('Message-Authen Before : ' + radiuspacketpayload['RadiusAttr_Message_Authenticator'].value.hex())
             print('authenticator : '+hashlib.md5(bytes(radiuspacketpayload)+secrectkey).hexdigest())
             print('Message-Authen : ' +hmac.new(secrectkey,bytes(radiuspacketpayload),hashlib.md5).hexdigest())
         except Exception as e:
             print(e)
+
         #將 Request Authenticator 和 Message Authenticator 變 0 計算
         radiuspacketpayload = rdpcap(pcapfilepath)[packetidx]['Radius']
         try:
             radiuspacketpayload.authenticator = bytes.fromhex('0'*32)
             radiuspacketpayload['RadiusAttr_Message_Authenticator'].value = bytes.fromhex('0'*32)
             print('-------------------------A = 0、M = 0-----------------------------------------')
+            print('authenticator Before : ' + radiuspacketpayload.authenticator.hex())
+            print('Message-Authen Before : ' + radiuspacketpayload['RadiusAttr_Message_Authenticator'].value.hex())
             print('authenticator : '+hashlib.md5(bytes(radiuspacketpayload)+secrectkey).hexdigest())
             print('Message-Authen : ' +hmac.new(secrectkey,bytes(radiuspacketpayload),hashlib.md5).hexdigest())
         except Exception as e:
             print(e)
-    def CreateCISCOExampleRadiusPacp(self,ouputpath:str)->None:
+
+    def CreateCISCOExampleRadiusPacp(self,outputpath:str)->None:
         '''Secrect Key is "cisco" '''
         packetbyte =bytes.fromhex('0116 0167 bed9 5259 5783 02c0 f918 4df6 \
             2b85 9d6b 0107 6369 7363 6f06 0600 0000 \
@@ -106,7 +135,23 @@ class PacketRelated8021X(PacketAction):
          /IP(src='192.168.10.10',dst='192.168.10.150')\
             /UDP(sport =51818,dport=1812)\
                 /packetbyte
-        wrpcap(ouputpath,radiuspecket)
+        wrpcap(outputpath,radiuspecket)
+
+    def Createradiusexample(self,outputpath:str)->None:
+        packetbytes = bytes.fromhex('28 00 00 35 00 00 00 00 \
+        00 00 00 00 00 00 00 00 \
+        00 00 00 00 01 0d 31 38 \
+        36 31 30 34 37 36 33 30 \
+        30 1f 0e 38 34 37 61 38 \
+        38 65 37 37 33 30 64 04 \
+        06 c0 a8 01 fa 74 65 73 \
+        74 69 6e 67 31 32 33')
+        radiuspecket = Ether(src =self.mac,dst='ff:ff:ff:ff:ff:ff')\
+         /IP(src='192.168.10.10',dst='192.168.10.150')\
+            /UDP(sport =51818,dport=1812)\
+                /packetbytes
+        wrpcap(outputpath,radiuspecket)
+
 
     def Encrypt_Pass(self,password, authenticator, secret):
         m = hashlib.md5()
