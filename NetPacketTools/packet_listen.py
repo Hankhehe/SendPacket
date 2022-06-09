@@ -1,5 +1,5 @@
 from scapy import packet
-from scapy.all import conf,get_working_ifaces,get_working_if,sniff,TCP,UDP,ICMP,Ether,IP,Radius
+from scapy.all import conf,get_working_ifaces,get_working_if,sniff,TCP,UDP,ICMP,Radius
 import datetime
 class PacketListenFromFilter:
     def __init__(self,NicName:str=get_working_if().name) -> None:
@@ -13,9 +13,11 @@ class PacketListenFromFilter:
         self.radiuspackets:list[dict] = []
         # self.other = []
         
-    def Sniffer(self,Filter:str,time:int)->None:
-        if not Filter and not str : return
-        sniff(filter = f'(ether dst {self.mac} or ether dst ff:ff:ff:ff:ff:ff) and {Filter}', store = 0,prn=self.CheckPacketType ,timeout =time ,iface=self.nicName)
+    def Sniffer(self,time:int,Filter:str|None=None)->None:
+        if Filter :
+            sniff(filter = f'(ether dst {self.mac} or ether dst ff:ff:ff:ff:ff:ff) and {Filter}', store = 0,prn=self.CheckPacketType ,timeout =time ,iface=self.nicName)
+        else:
+            sniff(filter = f'(ether dst {self.mac} or ether dst ff:ff:ff:ff:ff:ff)', store = 0,prn=self.CheckPacketType ,timeout =time ,iface=self.nicName)
 
     def CheckPacketType(self,Packet):
         if TCP in Packet:  self.CheckTCPPacket(Packet['TCP'])
@@ -24,20 +26,19 @@ class PacketListenFromFilter:
         else: pass
 
     def CheckTCPPacket(self,Packet):
-        pass
+        print(f'{str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} : {Packet.summary()}')
 
     def CheckUDPPacket(self,Packet):
-        if Radius in Packet:self.GetRadiusPacket(Packet['Radius'])
-        else:pass
+        print(f'{str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} : {Packet.summary()}')
+        # if Radius in Packet:self.GetRadiusPacket(Packet['Radius'])
+        # else:pass
 
-    
     def CheckICMPPacket(self,Packet):
-        pass
+        print(f'{str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} : {Packet.summary()}')
 
     
     def CheckOtherPacket(self,Packet):
-        pass
-        # print(f'{str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} Other Packet : {Packet.summary()}')
+        print(f'{str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} : {Packet.summary()}')
     
     def GetRadiusPacket(self,Packet)->None:
         self.radiuspackets.append({'time':datetime.datetime.now(),'packet':Packet})

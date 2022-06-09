@@ -2,7 +2,12 @@ from NetPacketTools.packet_action import PacketAction
 from NetPacketTools.packet_listen import PacketListenFromFilter
 from NetPacketTools.packet_action_test import PacketRelated8021X
 from CreateData import iprelated,macrelated
-import time
+import time,csv
+
+
+# lis = PacketListenFromFilter('乙太網路 3')
+# lis.Sniffer(time=60)
+# pass
 
 #用封包計算 Auth-Message Hash
 # testcase = PacketRelated8021X()
@@ -11,8 +16,6 @@ import time
 # testcase.CalcuProxyMessageAuthenticator(pcapfilepath='D:/radiusproxy.Pcap',packetidx=3,secrectkey=b'pixis')
 # # testcase.CalculateHashFromPacket(pcapfilepath='D:/CISCOCoa.pcap',packetidx=0,secrectkey=b'pixis')
 # pass
-
-
 
 
 #偵測 Wi-fi 網斷的 ARP MAC
@@ -37,13 +40,3 @@ import time
 # pass
 
 
-
-#發送 IP 衝突
-# lan1 = PacketAction('Wi-Fi')
-# while True :
-#     lan1.SendARPReply(IP='192.168.11.32',MAC='aa:00:00:00:00:00')
-#     lan1.SendARPReply(IP='192.168.11.32',MAC='aa:00:00:00:00:01')
-#     # time.sleep(1)
-# while True :
-#     lan1.SendARPReply(IP='192.168.11.32',MAC='aa:00:00:00:00:00')
-#     # time.sleep(1)

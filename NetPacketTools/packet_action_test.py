@@ -152,7 +152,6 @@ class PacketRelated8021X(PacketAction):
                 /packetbytes
         wrpcap(outputpath,radiuspecket)
 
-
     def Encrypt_Pass(self,password, authenticator, secret):
         m = hashlib.md5()
         m.update(secret+authenticator)
