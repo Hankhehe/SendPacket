@@ -1,9 +1,8 @@
-from string import punctuation
 import time,re
 from CreateData import iprelated,macrelated
 from scapy.all import get_working_if,get_working_ifaces,srp,sendp,conf,Ether,ARP,IP,UDP,BOOTP,DHCP,IPv6,DHCP6_Solicit,DHCP6OptElapsedTime,DHCP6OptClientId\
    ,DHCP6OptIA_NA,DHCP6OptOptReq,DHCP6_Request,DHCP6OptServerId,DHCP6OptIAAddress,ICMPv6NDOptDstLLAddr,DHCP6_Advertise,ICMPv6ND_NS,ICMPv6NDOptSrcLLAddr\
-      ,ICMPv6ND_RA,ICMPv6NDOptMTU,ICMPv6NDOptPrefixInfo,ICMPv6ND_NA,Radius,RadiusAttr_NAS_IP_Address,RadiusAttribute
+      ,ICMPv6ND_RA,ICMPv6NDOptMTU,ICMPv6NDOptPrefixInfo,ICMPv6ND_NA,Radius,RadiusAttr_NAS_IP_Address,RadiusAttribute,NBNSRequest
 
 class PacketAction:
 
@@ -147,3 +146,10 @@ class PacketAction:
       else : 
          return {'RadiusCode':result[0][1][Radius].code}
       #Radius Code : Accept =2 , Reject =3
+   
+   def SendNBNSResponse(self,name:str,workgroup:bool) -> None:
+      NBNSResponsepacket = Ether(src=self.mac,dst='ff:ff:ff:ff:ff:ff')\
+         /IP(src=self.Ip,dst='255.255.255.255')\
+            /UDP(sport=137,dport=137)\
+               /NBNSRequest(NB_ADDRESS=self.Ip,QUESTION_NAME=name,G=workgroup)
+      sendp(NBNSResponsepacket,iface=self.nicname)

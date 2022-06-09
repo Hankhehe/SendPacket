@@ -2,7 +2,7 @@ from NetPacketTools.packet_action import PacketAction
 from NetPacketTools.packet_listen import PacketListenFromFilter
 from NetPacketTools.packet_action_test import PacketRelated8021X
 from CreateData import iprelated,macrelated
-import time,csv
+import time,csv,ipaddress
 
 
 # lis = PacketListenFromFilter('乙太網路 3')

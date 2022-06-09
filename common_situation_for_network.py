@@ -32,3 +32,5 @@ lan1 = PacketAction('乙太網路')
 # SendIPconflict(ip='192.168.11.32',mac1='aa0000000000',mac2='aa0000000001',count=3)
 # SendIPv6Conflict(ipv6='2001:b030:2133:80b::11:32',mac1='aa0000000000',mac2='aa0000000001',count=3)
 # SendManyBroadcastOfARP()
+# lan1.SendNBNSResponse(name='Hank',workgroup=False) #發送主機名稱 by NBNS
+# lan1.SendNBNSResponse(name='WORKGROUP',workgroup=True) #發送網域群組 by NBNS
