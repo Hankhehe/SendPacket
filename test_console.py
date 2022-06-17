@@ -10,12 +10,12 @@ import time,csv,ipaddress
 # pass
 
 #用封包計算 Auth-Message Hash
-# testcase = PacketRelated8021X()
-# # testcase.CreateCISCOExampleRadiusPacp(outputpath='D:/test.pcap')
-# testcase.CalcuRespondAuthenticator(pcapfilepath='D:/1111.pcap',packetidx=1,secrectkey=b'pixis')
-# testcase.CalcuProxyMessageAuthenticator(pcapfilepath='D:/radiusproxy.Pcap',packetidx=3,secrectkey=b'pixis')
-# # testcase.CalculateHashFromPacket(pcapfilepath='D:/CISCOCoa.pcap',packetidx=0,secrectkey=b'pixis')
-# pass
+testcase = PacketRelated8021X()
+# testcase.CreateCISCOExampleRadiusPacp(outputpath='D:/test.pcap')
+# testcase.CalcuRespondAuthenticator(pcapfilepath='D:/1111.pcap',packetidx=19,secrectkey=b'pixis')
+# testcase.CalcuProxyMessageAuthenticator(pcapfilepath='D:/1111.Pcap',packetidx=19,secrectkey=b'pixis')
+testcase.CalculateHashFromPacket(pcapfilepath='D:/2222.pcap',packetidx=35,secrectkey=b'pixis')
+pass
 
 
 #偵測 Wi-fi 網斷的 ARP MAC

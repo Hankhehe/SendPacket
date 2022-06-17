@@ -105,6 +105,23 @@ class PacketRelated8021X(PacketAction):
             print('Message-Authen : ' +hmac.new(secrectkey,bytes(radiuspacketpayload),hashlib.md5).hexdigest())
         except Exception as e:
             print(e)
+        
+        #將 Request Authenticator 使用上一包 Message Authenticator 變 0 計算
+        radiuspacketpayloadlast = rdpcap(pcapfilepath)[packetidx-2]['Radius']
+        radiuspacketpayload = rdpcap(pcapfilepath)[packetidx]['Radius']
+        try:
+            radiuspacketpayload.authenticator = radiuspacketpayloadlast.authenticator
+            radiuspacketpayload['RadiusAttr_Message_Authenticator'].value = bytes.fromhex('0'*32)
+            print('-------------------------A = lastrequest、M = 0-----------------------------------------')
+            print('authenticator Before : ' + radiuspacketpayload.authenticator.hex())
+            print('Message-Authen Before : ' + radiuspacketpayload['RadiusAttr_Message_Authenticator'].value.hex())
+            print('Message-Authen : ' +hmac.new(secrectkey,bytes(radiuspacketpayload),hashlib.md5).hexdigest())
+            radiuspacketpayload['RadiusAttr_Message_Authenticator'].value = bytes.fromhex(hmac.new(secrectkey,bytes(radiuspacketpayload),hashlib.md5).hexdigest())
+            print('authenticator : '+hashlib.md5(bytes(radiuspacketpayload)+secrectkey).hexdigest())
+        except Exception as e:
+            print(e)
+
+
 
     def CreateCISCOExampleRadiusPacp(self,outputpath:str)->None:
         '''Secrect Key is "cisco" '''
