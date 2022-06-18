@@ -1,6 +1,6 @@
 from NetPacketTools.packet_action import PacketAction
 from NetPacketTools.packet_listen import PacketListenFromFilter
-from NetPacketTools.packet_action_test import PacketRelated8021X
+from NetPacketTools.PacketRelated8021X import PacketRelated8021X
 from CreateData import iprelated,macrelated
 import time,csv,ipaddress
 
@@ -11,10 +11,8 @@ import time,csv,ipaddress
 
 #用封包計算 Auth-Message Hash
 testcase = PacketRelated8021X()
-# testcase.CreateCISCOExampleRadiusPacp(outputpath='D:/test.pcap')
-# testcase.CalcuRespondAuthenticator(pcapfilepath='D:/1111.pcap',packetidx=19,secrectkey=b'pixis')
-# testcase.CalcuProxyMessageAuthenticator(pcapfilepath='D:/1111.Pcap',packetidx=19,secrectkey=b'pixis')
-testcase.CalculateHashFromPacket(pcapfilepath='D:/2222.pcap',packetidx=35,secrectkey=b'pixis')
+
+testcase.CalculateHashFromPacket(pcapfilepath='D:/2222.pcap',RespounseIdx=36,RequestIdx=35,secrectkey=b'pixis')
 pass
 
 

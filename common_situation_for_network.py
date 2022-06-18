@@ -1,9 +1,8 @@
-from string import punctuation
+import time
 from NetPacketTools.packet_action import PacketAction
 from NetPacketTools.packet_listen import PacketListenFromFilter
-from NetPacketTools.packet_action_test import PacketRelated8021X
 from CreateData import iprelated,macrelated
-import time,csv
+
 
 def SendIPconflict(ip:str,mac1:str,mac2:str,count:int) -> None:
     '''發送 IP 衝突'''
