@@ -1,9 +1,9 @@
 import ipaddress
 
-def CreateIPDataByCIDROrPrifix(ip:str) -> list | None:
+def CreateIPDataByCIDROrPrifix(cidr:str) -> list | None:
     '''Create Data of range IP in IPv4 or IPv6'''
-    ip = ipaddress.ip_interface(ip).network  # type: ignore
-    return list(ipaddress.ip_network(ip))
+    cidr = ipaddress.ip_interface(cidr).network  # type: ignore
+    return list(ipaddress.ip_network(cidr))
 
 def ConvertIPv6ShortToIPv6Full(ipv6:str) -> str | None:
       iplist = ipv6.split('::')

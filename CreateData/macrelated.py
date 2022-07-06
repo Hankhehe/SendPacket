@@ -1,11 +1,9 @@
 import re
 
-def CreateMACData(mac:str,count:int) -> list | None :
+def CreateMACData(mac:str,count:int) -> list :
     '''It can result consecutive MAC list when input stared MAC Address'''
     mac = ''.join(re.split(':|-|\.',mac)).upper()
-    if len(mac) != 12 : return
-    try: macnum =  int(mac,16) 
-    except Exception : return
+    macnum =  int(mac,16) 
     result = []
     for i in range(count) :
         result.append(hex(int( macnum + i))[2::].upper().zfill(12))

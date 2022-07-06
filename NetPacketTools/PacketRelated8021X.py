@@ -42,8 +42,7 @@ class PacketRelated8021X(PacketAction):
 
     def CalcuRespondAuthenticator(self,pcapfilepath:str,RespounseIdx:int,RequestIdx:int,secrectkey:bytes) -> None:
         radiusRespondPacketPayload = rdpcap(pcapfilepath)[RespounseIdx-1]['Radius']
-        radiusRequestPacketPayload = rdpcap(pcapfilepath)[RequestIdx-1]['Radius']
-        radiusRespondPacketPayload.authenticator = radiusRequestPacketPayload.authenticator
+        radiusRespondPacketPayload.authenticator = rdpcap(pcapfilepath)[RequestIdx-1]['Radius'].authenticator
         print('authenticator Before : ' + radiusRespondPacketPayload.authenticator.hex())
         print('authenticator : '+hashlib.md5(bytes(radiusRespondPacketPayload)+secrectkey).hexdigest())
 
@@ -52,13 +51,12 @@ class PacketRelated8021X(PacketAction):
         
         #使用前一包 Request 的 Authenticator 並將 Message Authenticator 變 0 計算
         #先 Hash 出 message-auth 後值填進去後再把 authencatitor 的值 Hash 出來
-        radiuspacketpayloadlast = rdpcap(pcapfilepath)[RequestIdx-1]['Radius']
         radiuspacketpayload = rdpcap(pcapfilepath)[RespounseIdx-1]['Radius']
-        radiuspacketpayload.authenticator = radiuspacketpayloadlast.authenticator
+        radiuspacketpayload.authenticator = rdpcap(pcapfilepath)[RequestIdx-1]['Radius'].authenticator
         radiuspacketpayload['RadiusAttr_Message_Authenticator'].value = bytes.fromhex('0'*32)
         print('-------------------------A = lastrequest、M = 0-----------------------------------------')
         print('Message-Authen Before : ' + radiuspacketpayload['RadiusAttr_Message_Authenticator'].value.hex())
-        print('Message-Authen : ' +hmac.new(secrectkey,bytes(radiuspacketpayload),hashlib.md5).hexdigest())
         radiuspacketpayload['RadiusAttr_Message_Authenticator'].value = bytes.fromhex(hmac.new(secrectkey,bytes(radiuspacketpayload),hashlib.md5).hexdigest())
+        print('Message-Authen : ' +radiuspacketpayload['RadiusAttr_Message_Authenticator'].value.hex())
         print('authenticator Before : ' + radiuspacketpayload.authenticator.hex())
         print('authenticator : '+hashlib.md5(bytes(radiuspacketpayload)+secrectkey).hexdigest())

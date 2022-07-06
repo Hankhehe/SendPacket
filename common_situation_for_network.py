@@ -4,6 +4,15 @@ from NetPacketTools.packet_listen import PacketListenFromFilter
 from CreateData import iprelated,macrelated
 
 
+def SendOnline() ->None:
+    ipv4list = iprelated.CreateIPDataByCIDROrPrifix(cidr='172.17.0.0/17')
+    ipv6list = iprelated.CreateIPDataByCIDROrPrifix(cidr='2001:b030:2133:811::/112')
+    maclist = macrelated.CreateMACData(mac='AA0000000000',count=32768)
+    while True :
+        for i in range(1,5001):
+            lan1.SendARPReply(IP=str(ipv4list[i]),MAC=maclist[i])
+            lan1.SendNA(IP=str(ipv6list[i]),MAC=maclist[i])
+
 def SendIPconflict(ip:str,mac1:str,mac2:str,count:int) -> None:
     '''發送 IP 衝突'''
     MACAddress1 = macrelated.ConvertMACbyPunctuation(mac=mac1,Punctuation=':')
@@ -33,3 +42,4 @@ lan1 = PacketAction('乙太網路')
 # SendManyBroadcastOfARP()
 # lan1.SendNBNSResponse(name='Hank',workgroup=False) #發送主機名稱 by NBNS
 # lan1.SendNBNSResponse(name='WORKGROUP',workgroup=True) #發送網域群組 by NBNS
+# SendOnline() #發送大量 IP and IPv6 and MAC 的 ARP 和 NDP

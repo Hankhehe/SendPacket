@@ -5,15 +5,23 @@ from CreateData import iprelated,macrelated
 import time,csv,ipaddress
 
 
+lan2_ = PacketAction('Ethernet2')
+while True:
+    lan2_.SendARPReply(IP='172.17.255.99',MAC='AA0000000000')
+    lan2_.SendNA(IP='2001:b030:2133:811::150',MAC='AA0000000000')
+    lan2_.SendNA(IP='2001:b030:2133:815::151',MAC='AA0000000000')
+    time.sleep(1)
+
+
 # lis = PacketListenFromFilter('乙太網路 3')
 # lis.Sniffer(time=60)
 # pass
 
 #用封包計算 Auth-Message Hash
-testcase = PacketRelated8021X()
+# testcase = PacketRelated8021X()
 
-testcase.CalculateHashFromPacket(pcapfilepath='D:/2222.pcap',RespounseIdx=36,RequestIdx=35,secrectkey=b'pixis')
-pass
+# testcase.CalculateHashFromPacket(pcapfilepath='D:/2222.pcap',RespounseIdx=36,RequestIdx=34,secrectkey=b'pixis')
+# pass
 
 
 #偵測 Wi-fi 網斷的 ARP MAC
