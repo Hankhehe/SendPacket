@@ -97,7 +97,7 @@ class PacketAction:
       else :
          MAC = self.mac
       for i in range(Count):
-         ARPReply = Ether(src =MAC,dst='ff:ff:ff:ff:ff:ff')\
+         ARPReply = Ether(src =self.mac,dst='ff:ff:ff:ff:ff:ff')\
             /ARP(op=2, hwsrc=MAC, psrc=IP)
          sendp(ARPReply,iface=self.nicname)
          time.sleep(WaitSec)

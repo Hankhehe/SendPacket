@@ -43,3 +43,7 @@ lan1 = PacketAction('乙太網路')
 # lan1.SendNBNSResponse(name='Hank',workgroup=False) #發送主機名稱 by NBNS
 # lan1.SendNBNSResponse(name='WORKGROUP',workgroup=True) #發送網域群組 by NBNS
 # SendOnline() #發送大量 IP and IPv6 and MAC 的 ARP 和 NDP
+while True :
+    lan1.SendARPReply(IP='192.168.24.2',MAC='AAAAAAAAAAAA')
+    time.sleep(1)
+    # lan1.SendARPReply(IP='192.168.21.2',MAC='AACCCCCCCCCC')
