@@ -64,9 +64,9 @@ class Ui_MainWindow(object):
         self.lineEdit_ARP_IP = QtWidgets.QLineEdit(self.tab)
         self.lineEdit_ARP_IP.setGeometry(QtCore.QRect(90, 50, 161, 20))
         self.lineEdit_ARP_IP.setObjectName("lineEdit_ARP_IP")
-        self.lineEdit_TargetMAC = QtWidgets.QLineEdit(self.tab)
-        self.lineEdit_TargetMAC.setGeometry(QtCore.QRect(90, 80, 161, 20))
-        self.lineEdit_TargetMAC.setObjectName("lineEdit_TargetMAC")
+        self.lineEdit_ARP_TargetMAC = QtWidgets.QLineEdit(self.tab)
+        self.lineEdit_ARP_TargetMAC.setGeometry(QtCore.QRect(90, 80, 161, 20))
+        self.lineEdit_ARP_TargetMAC.setObjectName("lineEdit_ARP_TargetMAC")
         self.label_ARP_SendCount = QtWidgets.QLabel(self.tab)
         self.label_ARP_SendCount.setGeometry(QtCore.QRect(10, 110, 71, 16))
         self.label_ARP_SendCount.setObjectName("label_ARP_SendCount")
@@ -89,6 +89,37 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
+        self.lineEdit_NDP_IPv6 = QtWidgets.QLineEdit(self.tab_2)
+        self.lineEdit_NDP_IPv6.setGeometry(QtCore.QRect(90, 50, 161, 20))
+        self.lineEdit_NDP_IPv6.setObjectName("lineEdit_NDP_IPv6")
+        self.lineEdit_NDP_TargetMAC = QtWidgets.QLineEdit(self.tab_2)
+        self.lineEdit_NDP_TargetMAC.setGeometry(QtCore.QRect(90, 80, 161, 20))
+        self.lineEdit_NDP_TargetMAC.setObjectName("lineEdit_NDP_TargetMAC")
+        self.lineEdit_NDP_SendCount = QtWidgets.QLineEdit(self.tab_2)
+        self.lineEdit_NDP_SendCount.setGeometry(QtCore.QRect(90, 110, 61, 20))
+        self.lineEdit_NDP_SendCount.setObjectName("lineEdit_NDP_SendCount")
+        self.pushButton_NDP_Send = QtWidgets.QPushButton(self.tab_2)
+        self.pushButton_NDP_Send.setGeometry(QtCore.QRect(170, 110, 75, 23))
+        self.pushButton_NDP_Send.setObjectName("pushButton_NDP_Send")
+        self.label_NDP_IPv6 = QtWidgets.QLabel(self.tab_2)
+        self.label_NDP_IPv6.setGeometry(QtCore.QRect(10, 50, 61, 16))
+        self.label_NDP_IPv6.setObjectName("label_NDP_IPv6")
+        self.label_NDP_TargetMAC = QtWidgets.QLabel(self.tab_2)
+        self.label_NDP_TargetMAC.setGeometry(QtCore.QRect(10, 80, 61, 16))
+        self.label_NDP_TargetMAC.setObjectName("label_NDP_TargetMAC")
+        self.label_NDP_SendCount = QtWidgets.QLabel(self.tab_2)
+        self.label_NDP_SendCount.setGeometry(QtCore.QRect(10, 110, 71, 16))
+        self.label_NDP_SendCount.setObjectName("label_NDP_SendCount")
+        self.groupBox_NDP_OPCode = QtWidgets.QGroupBox(self.tab_2)
+        self.groupBox_NDP_OPCode.setGeometry(QtCore.QRect(10, 10, 241, 31))
+        self.groupBox_NDP_OPCode.setObjectName("groupBox_NDP_OPCode")
+        self.radioButton_NDP_Request = QtWidgets.QRadioButton(self.groupBox_NDP_OPCode)
+        self.radioButton_NDP_Request.setGeometry(QtCore.QRect(60, 10, 83, 16))
+        self.radioButton_NDP_Request.setChecked(True)
+        self.radioButton_NDP_Request.setObjectName("radioButton_NDP_Request")
+        self.radioButton_NDP_Reply = QtWidgets.QRadioButton(self.groupBox_NDP_OPCode)
+        self.radioButton_NDP_Reply.setGeometry(QtCore.QRect(150, 10, 83, 16))
+        self.radioButton_NDP_Reply.setObjectName("radioButton_NDP_Reply")
         self.tabWidget.addTab(self.tab_2, "")
         self.plainTextEdit_PrintMessage = QtWidgets.QPlainTextEdit(self.centralwidget)
         self.plainTextEdit_PrintMessage.setGeometry(QtCore.QRect(30, 380, 741, 181))
@@ -103,6 +134,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -124,13 +156,22 @@ class Ui_MainWindow(object):
         self.radioButton_ARP_Request.setText(_translate("MainWindow", "Request"))
         self.radioButton_ARP_Reply.setText(_translate("MainWindow", "Reply"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "ARP"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
+        self.lineEdit_NDP_SendCount.setText(_translate("MainWindow", "1"))
+        self.pushButton_NDP_Send.setText(_translate("MainWindow", "Send"))
+        self.label_NDP_IPv6.setText(_translate("MainWindow", "IPv6"))
+        self.label_NDP_TargetMAC.setText(_translate("MainWindow", "Target MAC"))
+        self.label_NDP_SendCount.setText(_translate("MainWindow", "Send Count"))
+        self.groupBox_NDP_OPCode.setTitle(_translate("MainWindow", "OPCode"))
+        self.radioButton_NDP_Request.setText(_translate("MainWindow", "Request"))
+        self.radioButton_NDP_Reply.setText(_translate("MainWindow", "Reply"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "NDP"))
 
 
 
         self.comboBox_eth_SelectNIC.addItems(self.GetNICAllName())
         self.comboBox_eth_SelectNIC.currentIndexChanged.connect(self.GetNICInfo)
-        self.pushButton_ARP_Send.clicked.connect(self.SenARP)
+        self.pushButton_ARP_Send.clicked.connect(self.SendARP)
+        self.pushButton_NDP_Send.clicked.connect(self.SendNDP)
     
     def GetNICAllName(self) -> list[str]:
         NICs = get_working_ifaces()
@@ -154,18 +195,33 @@ class Ui_MainWindow(object):
         else : Gatewayv6 = Gatewayv6[2]
         self.lineEdit_eth_Gatewayv6.setText(str(Gatewayv6))
     
-    def SenARP(self) -> None:
+    def SendARP(self) -> None:
         lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
         if self.radioButton_ARP_Request.isChecked():
+            r = None
             for i in range(int(self.lineEdit_ARP_SendCount.text())):
                 r = lan.GetIPv4MAC(dstip=str(self.lineEdit_ARP_IP.text()))
-                self.plainTextEdit_PrintMessage.appendPlainText(str(f'IP:{str(self.lineEdit_ARP_IP.text())}\nMAC : {str(r)}'))
+                self.plainTextEdit_PrintMessage.appendPlainText(str(f'IP :{str(self.lineEdit_ARP_IP.text())}\nMAC : {str(r)}'))
         elif self.radioButton_ARP_Reply.isChecked():
             for i in range(int(self.lineEdit_ARP_SendCount.text())):
-                lan.SendARPReply(IP=str(self.lineEdit_ARP_IP.text()),MAC=str(self.lineEdit_TargetMAC.text()))
-                self.plainTextEdit_PrintMessage.appendPlainText(f'Send ARP Reply IP : {str(self.lineEdit_ARP_IP.text())}\nMAC : {str(self.lineEdit_TargetMAC.text())}')
-
+                lan.SendARPReply(IP=str(self.lineEdit_ARP_IP.text()),MAC=str(self.lineEdit_ARP_TargetMAC.text()))
+                self.plainTextEdit_PrintMessage.appendPlainText(f'Send ARP Reply IP : {str(self.lineEdit_ARP_IP.text())}\n\
+                MAC : {str(self.lineEdit_ARP_TargetMAC.text())}')
     
+    def SendNDP(self) -> None :
+        lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
+        if self.radioButton_NDP_Request.isChecked():
+            r = None
+            for i in range(int(self.lineEdit_NDP_SendCount.text())):
+                r = lan.GetIPv6MAC(dstIP=str(self.lineEdit_NDP_IPv6.text()))
+                self.plainTextEdit_PrintMessage.appendPlainText(str(f'IPv6 :{str(self.lineEdit_NDP_IPv6.text())}\nMAC : {str(r)}'))
+        elif self.radioButton_NDP_Reply.isChecked():
+            for i in range(int(self.lineEdit_NDP_SendCount.text())):
+                lan.SendNA(IP=str(self.lineEdit_NDP_IPv6.text()),MAC=str(self.lineEdit_NDP_TargetMAC.text()))
+                self.plainTextEdit_PrintMessage.appendPlainText(f'Send NDP Reply IPv6 : {str(self.lineEdit_NDP_IPv6.text())}\n\
+                MAC : {str(self.lineEdit_NDP_TargetMAC.text())}')     
+
+
 
 if __name__ == "__main__":
     import sys
