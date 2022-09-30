@@ -1,6 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from NetPacketTools.packet_action import PacketAction
 from scapy.all import get_working_ifaces,get_working_if,conf
+from CreateData import iprelated,macrelated
+import time
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -121,6 +123,39 @@ class Ui_MainWindow(object):
         self.radioButton_NDP_Reply.setGeometry(QtCore.QRect(150, 10, 83, 16))
         self.radioButton_NDP_Reply.setObjectName("radioButton_NDP_Reply")
         self.tabWidget.addTab(self.tab_2, "")
+        self.tab_3 = QtWidgets.QWidget()
+        self.tab_3.setObjectName("tab_3")
+        self.pushButton_StressTest_DHCP = QtWidgets.QPushButton(self.tab_3)
+        self.pushButton_StressTest_DHCP.setGeometry(QtCore.QRect(160, 10, 75, 23))
+        self.pushButton_StressTest_DHCP.setObjectName("pushButton_StressTest_DHCP")
+        self.pushButton_StressTest_DHCPv6 = QtWidgets.QPushButton(self.tab_3)
+        self.pushButton_StressTest_DHCPv6.setGeometry(QtCore.QRect(240, 10, 75, 23))
+        self.pushButton_StressTest_DHCPv6.setObjectName("pushButton_StressTest_DHCPv6")
+        self.label_StressTest_SendCount = QtWidgets.QLabel(self.tab_3)
+        self.label_StressTest_SendCount.setGeometry(QtCore.QRect(20, 10, 61, 16))
+        self.label_StressTest_SendCount.setObjectName("label_StressTest_SendCount")
+        self.lineEdit_StressTest_SendCount = QtWidgets.QLineEdit(self.tab_3)
+        self.lineEdit_StressTest_SendCount.setGeometry(QtCore.QRect(90, 10, 61, 20))
+        self.lineEdit_StressTest_SendCount.setObjectName("lineEdit_StressTest_SendCount")
+        self.label_StressTest_IPv4CIDR = QtWidgets.QLabel(self.tab_3)
+        self.label_StressTest_IPv4CIDR.setGeometry(QtCore.QRect(20, 50, 61, 16))
+        self.label_StressTest_IPv4CIDR.setObjectName("label_StressTest_IPv4CIDR")
+        self.lineEdit_StressTest_CIDR = QtWidgets.QLineEdit(self.tab_3)
+        self.lineEdit_StressTest_CIDR.setGeometry(QtCore.QRect(90, 50, 351, 20))
+        self.lineEdit_StressTest_CIDR.setObjectName("lineEdit_StressTest_CIDR")
+        self.pushButton_StressTest_SendARP = QtWidgets.QPushButton(self.tab_3)
+        self.pushButton_StressTest_SendARP.setGeometry(QtCore.QRect(470, 50, 75, 23))
+        self.pushButton_StressTest_SendARP.setObjectName("pushButton_StressTest_SendARP")
+        self.lineEdit_StressTest_Prefix = QtWidgets.QLineEdit(self.tab_3)
+        self.lineEdit_StressTest_Prefix.setGeometry(QtCore.QRect(90, 90, 351, 20))
+        self.lineEdit_StressTest_Prefix.setObjectName("lineEdit_StressTest_Prefix")
+        self.label_StressTest_Prefix = QtWidgets.QLabel(self.tab_3)
+        self.label_StressTest_Prefix.setGeometry(QtCore.QRect(20, 90, 61, 16))
+        self.label_StressTest_Prefix.setObjectName("label_StressTest_Prefix")
+        self.pushButton_StressTest_SendNDP = QtWidgets.QPushButton(self.tab_3)
+        self.pushButton_StressTest_SendNDP.setGeometry(QtCore.QRect(470, 90, 75, 23))
+        self.pushButton_StressTest_SendNDP.setObjectName("pushButton_StressTest_SendNDP")
+        self.tabWidget.addTab(self.tab_3, "")
         self.plainTextEdit_PrintMessage = QtWidgets.QPlainTextEdit(self.centralwidget)
         self.plainTextEdit_PrintMessage.setGeometry(QtCore.QRect(30, 380, 741, 181))
         self.plainTextEdit_PrintMessage.setObjectName("plainTextEdit_PrintMessage")
@@ -165,6 +200,18 @@ class Ui_MainWindow(object):
         self.radioButton_NDP_Request.setText(_translate("MainWindow", "Request"))
         self.radioButton_NDP_Reply.setText(_translate("MainWindow", "Reply"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "NDP"))
+        self.pushButton_StressTest_DHCP.setText(_translate("MainWindow", "DHCP"))
+        self.pushButton_StressTest_DHCPv6.setText(_translate("MainWindow", "DHCPv6"))
+        self.label_StressTest_SendCount.setText(_translate("MainWindow", "SendCount"))
+        self.lineEdit_StressTest_SendCount.setText(_translate("MainWindow", "70"))
+        self.label_StressTest_IPv4CIDR.setText(_translate("MainWindow", "IPv4 CIDR"))
+        self.lineEdit_StressTest_CIDR.setText(_translate("MainWindow", "192.168.1.0/24"))
+        self.pushButton_StressTest_SendARP.setText(_translate("MainWindow", "Send"))
+        self.lineEdit_StressTest_Prefix.setText(_translate("MainWindow", "2001:b030:2133:811::/64"))
+        self.label_StressTest_Prefix.setText(_translate("MainWindow", "IPv6 Prefix"))
+        self.pushButton_StressTest_SendNDP.setText(_translate("MainWindow", "Send"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Stress Test"))
+
 
 
 
@@ -172,6 +219,8 @@ class Ui_MainWindow(object):
         self.comboBox_eth_SelectNIC.currentIndexChanged.connect(self.GetNICInfo)
         self.pushButton_ARP_Send.clicked.connect(self.SendARP)
         self.pushButton_NDP_Send.clicked.connect(self.SendNDP)
+        self.pushButton_StressTest_DHCP.clicked.connect(self.test_DHCPv4)
+        self.pushButton_StressTest_DHCPv6.clicked.connect(self.test_DHCPv6)
     
     def GetNICAllName(self) -> list[str]:
         NICs = get_working_ifaces()
@@ -219,9 +268,43 @@ class Ui_MainWindow(object):
             for i in range(int(self.lineEdit_NDP_SendCount.text())):
                 lan.SendNA(IP=str(self.lineEdit_NDP_IPv6.text()),MAC=str(self.lineEdit_NDP_TargetMAC.text()))
                 self.plainTextEdit_PrintMessage.appendPlainText(f'Send NDP Reply IPv6 : {str(self.lineEdit_NDP_IPv6.text())}\n\
-                MAC : {str(self.lineEdit_NDP_TargetMAC.text())}')     
+                MAC : {str(self.lineEdit_NDP_TargetMAC.text())}')
+    
+    def test_DHCPv4(self)->None:
+        lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
+        macint = 186916976721920 #產生假 MAC AA0000000000
+        for tranId in range(int(self.lineEdit_StressTest_SendCount.text())):
+            result =  lan.GetIPfromDHCPv4(tranId=tranId,mac=hex(macint)[2::]) #檢查是否有從 DHCP ACK 中取得資料
+            self.plainTextEdit_PrintMessage.appendPlainText(f'{time.strftime("%Y-%m-%d %I:%M:%S %p",time.localtime() )},\
+                TranID :{tranId}, GetIP : {result}, MAC : {hex(macint)[2::]}')
+            macint +=1 #每跑完一次 MAC 加一 ex AA0000000000 to AA0000000001
 
+    def test_DHCPv6(self)->None:
+        lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
+        macint = 186916976721920 #產生假 MAC AA0000000000
+        for tranId in range(int(self.lineEdit_StressTest_SendCount.text())):
+            result =  lan.GetIPfromDHCPv6(tranId=tranId,mac=hex(macint)[2::]) #檢查是否有從 DHCPv6 ACK 中取得資料
+            self.plainTextEdit_PrintMessage.appendPlainText(f'{time.strftime("%Y-%m-%d %I:%M:%S %p",time.localtime() )},\
+                 TranID : {tranId}, GetIP : {result}, MAC : {hex(macint)[2::]}')
+            macint +=1 #每跑完一次 MAC 加一 ex AA0000000000 to AA0000000001
 
+    def test_SendIPv4Online(self)-> None:
+        lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
+        #產生 .0 到 .255 的 IP 數量
+        iplist = iprelated.CreateIPDataByCIDROrPrifix(cidr=str(self.lineEdit_StressTest_CIDR.text()))
+        #產生大量 MAC 從 AA0000000000 開始到 AA00000000FF ，數量由 IP 數決定
+        maclist = macrelated.CreateMACData(mac='AA0000000000',count=len(iplist))
+        for i in range(1,len(iplist)-1): #發送 254 個 ARP Reply ，從 .1 和 MAC AA0000000001 開始
+            lan.SendARPReply(IP=iplist[i],MAC=maclist[i])
+
+    def test_SendIPv6Online(self) -> None:
+        lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
+        #產生 :: 到 ::ff 的 IP 數量
+        ipv6list = iprelated.CreateIPDataByCIDROrPrifix(cidr=str(self.lineEdit_StressTest_Prefix.text()))
+        #產生大量 MAC 從 AA0000000000 開始到 AA00000000FF ，數量由 IP 數決定
+        maclist = macrelated.CreateMACData(mac='AA0000000000',count=len(ipv6list))
+        for i in range(1,len(ipv6list)-1): #發送 254 個 ICMPv6 Adver ，從 :1 和 MAC AA0000000001 開始
+            lan.SendNA(IP=ipv6list[i],MAC=maclist[i])
 
 if __name__ == "__main__":
     import sys
