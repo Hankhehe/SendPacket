@@ -221,6 +221,8 @@ class Ui_MainWindow(object):
         self.pushButton_NDP_Send.clicked.connect(self.SendNDP)
         self.pushButton_StressTest_DHCP.clicked.connect(self.test_DHCPv4)
         self.pushButton_StressTest_DHCPv6.clicked.connect(self.test_DHCPv6)
+        self.pushButton_StressTest_SendARP.clicked.connect(self.test_SendIPv4Online)
+        self.pushButton_StressTest_SendNDP.clicked.connect(self.test_SendIPv6Online)
     
     def GetNICAllName(self) -> list[str]:
         NICs = get_working_ifaces()
@@ -275,8 +277,7 @@ class Ui_MainWindow(object):
         macint = 186916976721920 #產生假 MAC AA0000000000
         for tranId in range(int(self.lineEdit_StressTest_SendCount.text())):
             result =  lan.GetIPfromDHCPv4(tranId=tranId,mac=hex(macint)[2::]) #檢查是否有從 DHCP ACK 中取得資料
-            self.plainTextEdit_PrintMessage.appendPlainText(f'{time.strftime("%Y-%m-%d %I:%M:%S %p",time.localtime() )},\
-                TranID :{tranId}, GetIP : {result}, MAC : {hex(macint)[2::]}')
+            self.plainTextEdit_PrintMessage.appendPlainText(f'{time.strftime("%Y-%m-%d %I:%M:%S %p",time.localtime() )}, TranID :{tranId}, GetIP : {result}, MAC : {hex(macint)[2::]}')
             macint +=1 #每跑完一次 MAC 加一 ex AA0000000000 to AA0000000001
 
     def test_DHCPv6(self)->None:
@@ -284,8 +285,7 @@ class Ui_MainWindow(object):
         macint = 186916976721920 #產生假 MAC AA0000000000
         for tranId in range(int(self.lineEdit_StressTest_SendCount.text())):
             result =  lan.GetIPfromDHCPv6(tranId=tranId,mac=hex(macint)[2::]) #檢查是否有從 DHCPv6 ACK 中取得資料
-            self.plainTextEdit_PrintMessage.appendPlainText(f'{time.strftime("%Y-%m-%d %I:%M:%S %p",time.localtime() )},\
-                 TranID : {tranId}, GetIP : {result}, MAC : {hex(macint)[2::]}')
+            self.plainTextEdit_PrintMessage.appendPlainText(f'{time.strftime("%Y-%m-%d %I:%M:%S %p",time.localtime() )},TranID : {tranId}, GetIP : {result}, MAC : {hex(macint)[2::]}')
             macint +=1 #每跑完一次 MAC 加一 ex AA0000000000 to AA0000000001
 
     def test_SendIPv4Online(self)-> None:
