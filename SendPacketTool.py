@@ -156,6 +156,24 @@ class Ui_MainWindow(object):
         self.pushButton_StressTest_SendNDP.setGeometry(QtCore.QRect(470, 90, 75, 23))
         self.pushButton_StressTest_SendNDP.setObjectName("pushButton_StressTest_SendNDP")
         self.tabWidget.addTab(self.tab_3, "")
+        self.tab_4 = QtWidgets.QWidget()
+        self.tab_4.setObjectName("tab_4")
+        self.pushButton_Other_DHCPv4Offer = QtWidgets.QPushButton(self.tab_4)
+        self.pushButton_Other_DHCPv4Offer.setGeometry(QtCore.QRect(20, 10, 91, 23))
+        self.pushButton_Other_DHCPv4Offer.setObjectName("pushButton_Other_DHCPv4Offer")
+        self.pushButton_Other_DHCPv6Adver = QtWidgets.QPushButton(self.tab_4)
+        self.pushButton_Other_DHCPv6Adver.setGeometry(QtCore.QRect(120, 10, 91, 23))
+        self.pushButton_Other_DHCPv6Adver.setObjectName("pushButton_Other_DHCPv6Adver")
+        self.pushButton_Other_SendHostName = QtWidgets.QPushButton(self.tab_4)
+        self.pushButton_Other_SendHostName.setGeometry(QtCore.QRect(200, 50, 91, 23))
+        self.pushButton_Other_SendHostName.setObjectName("pushButton_Other_SendHostName")
+        self.lineEdit_Other_NBNSResponse = QtWidgets.QLineEdit(self.tab_4)
+        self.lineEdit_Other_NBNSResponse.setGeometry(QtCore.QRect(20, 50, 171, 20))
+        self.lineEdit_Other_NBNSResponse.setObjectName("lineEdit_Other_NBNSResponse")
+        self.pushButton_Other_SendWorkgroup = QtWidgets.QPushButton(self.tab_4)
+        self.pushButton_Other_SendWorkgroup.setGeometry(QtCore.QRect(300, 50, 91, 23))
+        self.pushButton_Other_SendWorkgroup.setObjectName("pushButton_Other_SendWorkgroup")
+        self.tabWidget.addTab(self.tab_4, "")
         self.plainTextEdit_PrintMessage = QtWidgets.QPlainTextEdit(self.centralwidget)
         self.plainTextEdit_PrintMessage.setGeometry(QtCore.QRect(30, 380, 741, 181))
         self.plainTextEdit_PrintMessage.setObjectName("plainTextEdit_PrintMessage")
@@ -211,6 +229,11 @@ class Ui_MainWindow(object):
         self.label_StressTest_Prefix.setText(_translate("MainWindow", "IPv6 Prefix"))
         self.pushButton_StressTest_SendNDP.setText(_translate("MainWindow", "Send"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Stress Test"))
+        self.pushButton_Other_DHCPv4Offer.setText(_translate("MainWindow", "DHCP Offer"))
+        self.pushButton_Other_DHCPv6Adver.setText(_translate("MainWindow", "DHCPv6 Adver"))
+        self.pushButton_Other_SendHostName.setText(_translate("MainWindow", "Send HostName"))
+        self.pushButton_Other_SendWorkgroup.setText(_translate("MainWindow", "Send Workgroup"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("MainWindow", "Other"))
 
 
 
@@ -223,6 +246,10 @@ class Ui_MainWindow(object):
         self.pushButton_StressTest_DHCPv6.clicked.connect(self.test_DHCPv6)
         self.pushButton_StressTest_SendARP.clicked.connect(self.test_SendIPv4Online)
         self.pushButton_StressTest_SendNDP.clicked.connect(self.test_SendIPv6Online)
+        self.pushButton_Other_DHCPv4Offer.clicked.connect(self.SendDHCPv4Offer)
+        self.pushButton_Other_DHCPv6Adver.clicked.connect(self.SendDHCPv6Adv)
+        self.pushButton_Other_SendHostName.clicked.connect(self.SendNBNSHostName)
+        self.pushButton_Other_SendWorkgroup.clicked.connect(self.SendNBNSWorkgroup)
     
     def GetNICAllName(self) -> list[str]:
         NICs = get_working_ifaces()
@@ -305,6 +332,22 @@ class Ui_MainWindow(object):
         maclist = macrelated.CreateMACData(mac='AA0000000000',count=len(ipv6list))
         for i in range(1,len(ipv6list)-1): #發送 254 個 ICMPv6 Adver ，從 :1 和 MAC AA0000000001 開始
             lan.SendNA(IP=ipv6list[i],MAC=maclist[i])
+
+    def SendNBNSHostName(self) -> None:
+        lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
+        lan.SendNBNSResponse(name=self.lineEdit_Other_NBNSResponse.text(),workgroup=False)
+
+    def SendNBNSWorkgroup(self) -> None:
+        lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
+        lan.SendNBNSResponse(name=self.lineEdit_Other_NBNSResponse.text(),workgroup=True)
+    
+    def SendDHCPv4Offer(self) -> None:
+        lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
+        lan.SendDHCPv4Offer()
+    
+    def SendDHCPv6Adv(self) -> None:
+        lan = PacketAction(str(self.comboBox_eth_SelectNIC.currentText()))
+        lan.SendDHCPv6Advertise()
 
 if __name__ == "__main__":
     import sys

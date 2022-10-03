@@ -586,6 +586,73 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_4">
+     <attribute name="title">
+      <string>Other</string>
+     </attribute>
+     <widget class="QPushButton" name="pushButton_Other_DHCPv4Offer">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>91</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>DHCP Offer</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_Other_DHCPv6Adver">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>10</y>
+        <width>91</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>DHCPv6 Adver</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_Other_SendHostName">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>50</y>
+        <width>91</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Send HostName</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_Other_NBNSResponse">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>50</y>
+        <width>171</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_Other_SendWorkgroup">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>50</y>
+        <width>91</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Send Workgroup</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
    <widget class="QPlainTextEdit" name="plainTextEdit_PrintMessage">
     <property name="geometry">
